@@ -93,16 +93,26 @@ body {
 }
 
 .box {
-    flex: 1 0 200px; /* Adjust as needed */
-    background-color: #202225; /* Darker gray boxes */
+    background-color: #202225;
     border-radius: 8px;
     color: #dcddde;
 }
 
-h2, h4, th, tr  {
+h2, h4, th  {
     text-align: center;
     color: #7289da;
     margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: left;
 }
 
 form {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klasifikasi File CSV</title>
+    <title>Klasifikasi File Xlsx</title>
     <link rel="stylesheet" href="static/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
@@ -19,16 +19,18 @@
     <div class="container">
         <div class="section">
             <div class="upload-section">
-                <h2>Klasifikasi File CSV</h2>
+                <h2>Klasifikasi File Xlsx</h2>
                 <div class="upload-area">
                     <form id="upload-form" method="POST" enctype="multipart/form-data">
-                        <input type="file" name="file" accept=".csv">
+                        <input type="file" name="file" accept=".xlsx" required>
                         <button type="submit">Upload & Analisis</button>
                     </form>
                 </div>
+                <h3 id="prediction">Status</h3>
             </div>
+
             <div class="top-section">
-                <div class="box">
+                <div class="box" style="grid-column: 1 / span 2;">
                     <h4>10 Kata Positif Terbanyak</h4>
                     <table id="positive-table">
                         <thead>
@@ -37,7 +39,7 @@
                         <tbody id="positive-tbody"></tbody>
                     </table>
                 </div>
-                <div class="box">
+                <div class="box" style="grid-column: 1 / span 2;">
                     <h4>10 Kata Negatif Terbanyak</h4>
                     <table id="negative-table">
                         <thead>
@@ -47,54 +49,88 @@
                     </table>
                 </div>
             </div>
-    </div>
 
-    <div class="container_single">
-        <div class="box" style="grid-column: 1 / span 2;">
-            <h2>Tabel Hasil Klasifikasi</h2>
-            <table id="sentimen-table">
-                <thead>
-                    <tr>
-                        <th>Review</th>
-                        <th>Sentimen</th>
-                    </tr>
-                </thead>
-            <tbody id="sentimen-tbody"></tbody>
         </div>
+
+        <div class="bottom-section">
+            <div class="box" style="grid-column: 2 / span 2;">
+                <h2>Tabel Hasil Klasifikasi</h2>
+                <table id="sentimen-table">
+                    <thead>
+                        <tr>
+                            <th>Review</th>
+                            <th>Sentimen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sentimen-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
         $(document).ready(function() {
             $('#upload-form').submit(function(event) {
                 event.preventDefault();
-                let formData = new FormData(this);
+                var formData = new FormData(this);
+
+                $('#positive-tbody').html('');
+                $('#negative-tbody').html('');
+                $('#sentimen-tbody').html('');
+
+                $('#prediction').text('Processing...');
+
                 $.ajax({
-                    url: '/klasifikasi-multiple',
+                    url: '/multiple-predict',
                     type: 'POST',
                     data: formData,
-                    processData: false,
                     contentType: false,
+                    processData: false,
                     success: function(data) {
-                        //Example of how to populate tables: (adapt to your data structure)
-                        $('#positive-tbody').html(generateTableRows(data.positiveWords));
-                        $('#negative-tbody').html(generateTableRows(data.negativeWords));
-                        $('#sentimen-tbody').html(generateSentimenRows(data.sentiments));
-
-                        function generateTableRows(data) {
-                            return data.map(item => `<tr><td>${item.word}</td><td>${item.count}</td></tr>`).join('');
+                        // Handle potential errors in the response data
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            alert('Error: ' + data.error);
+                            return;
                         }
 
-                        function generateSentimenRows(data) {
-                            return data.map(item => `<tr><td>${item.review}</td><td>${item.sentiment}</td></tr>`).join('');
+                        //Check if data is properly structured
+                        if (!data.predictions || !data.top_positive_words || !data.top_negative_words) {
+                            console.error('Invalid data format from server:', data);
+                            alert('Error: Invalid data received from server.');
+                            return;
                         }
 
+
+                        $('#positive-tbody').html(generateTableRows(data.top_positive_words));
+                        $('#negative-tbody').html(generateTableRows(data.top_negative_words));
+
+                        let sentimenRowsData = [];
+                        for (let i = 0; i < data.predictions.length; i++) {
+                            sentimenRowsData.push({content: data.preprocessed_texts[i], sentiment: data.predictions[i]});
+                        }
+
+                        $('#sentimen-tbody').html(generateSentimenRows(sentimenRowsData));
+                        $('#prediction').text('Done');
                     },
                     error: function(error) {
-                        console.error("Error:", error);
-                        alert('Error processing file. Please try again.');
+                        $('#prediction').text('Error');
+                        console.error('Error:', error);
+                        alert('Error during file processing. Please try again.');
                     }
                 });
             });
+
+            function generateTableRows(data) {
+                return data.map(item => `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`).join('');
+            }
+
+            function generateSentimenRows(data) {
+                return data.map(item => `<tr><td>${item.content}</td><td>${item.sentiment}</td></tr>`).join('');
+            }
+
+            
         });
     </script>
 
