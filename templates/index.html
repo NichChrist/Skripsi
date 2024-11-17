@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Sentimen Ulasan Discord</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-item"><a href="/">Analisis Sentimen Ulasan Discord</a></div>
+        <div class="nav-item"><a href="/">Klasifikasi</a></div>
+        <div class="nav-item"><a href="/klasifikasi-multiple">Klasifikasi Multiple</a></div>
+        <div class="nav-item"><a href="/model-evaluation">Evaluasi Model</a></div>
+    </div>
+
+    <div class="container_single">
+        <h2>Klasifikasi Teks</h2>
+        <form id="prediction-form">
+            <label for="input-data">Input Teks:</label>
+            <textarea id="input-data" name="input-data" rows="2"></textarea>
+            <button type="submit">Klasifikasi</button>
+        </form>
+
+        <div id="preprocessing">Preprocessing:</div>
+        <div id="prediction">Klasifikasi:</div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            $('#prediction-form').submit(function(event) {
+                event.preventDefault();
+                const inputData = $('#input-data').val().trim();
+
+                if (!inputData) {
+                    alert('Input cannot be empty. Please enter some text.');
+                    return;
+                }
+
+                $('#prediction').text('Processing...');
+                
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ text: inputData }),
+                    success: function(data) {
+                        $('#preprocessing').text(`Preprocessing: ${data.preprocessing}`);
+                        $('#prediction').text(`Klasifikasi: ${data.prediction}`);
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                        $('#prediction').text('Error making prediction. Please try again later.');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

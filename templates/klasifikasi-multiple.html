@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klasifikasi File CSV</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-item"><a href="/">Analisis Sentimen Ulasan Discord</a></div>
+        <div class="nav-item"><a href="/">Klasifikasi</a></div>
+        <div class="nav-item"><a href="/klasifikasi-multiple">Klasifikasi Multiple</a></div>
+        <div class="nav-item"><a href="/model-evaluation">Evaluasi Model</a></div>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <div class="upload-section">
+                <h2>Klasifikasi File CSV</h2>
+                <div class="upload-area">
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="file" accept=".csv">
+                        <button type="submit">Upload & Analisis</button>
+                    </form>
+                </div>
+            </div>
+            <div class="top-section">
+                <div class="box">
+                    <h4>10 Kata Positif Terbanyak</h4>
+                    <table id="positive-table">
+                        <thead>
+                            <tr><th>Kata</th><th>Jumlah</th></tr>
+                        </thead>
+                        <tbody id="positive-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="box">
+                    <h4>10 Kata Negatif Terbanyak</h4>
+                    <table id="negative-table">
+                        <thead>
+                            <tr><th>Kata</th><th>Jumlah</th></tr>
+                        </thead>
+                        <tbody id="negative-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <div class="container_single">
+        <div class="box" style="grid-column: 1 / span 2;">
+            <h2>Tabel Hasil Klasifikasi</h2>
+            <table id="sentimen-table">
+                <thead>
+                    <tr>
+                        <th>Review</th>
+                        <th>Sentimen</th>
+                    </tr>
+                </thead>
+            <tbody id="sentimen-tbody"></tbody>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#upload-form').submit(function(event) {
+                event.preventDefault();
+                let formData = new FormData(this);
+                $.ajax({
+                    url: '/klasifikasi-multiple',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        //Example of how to populate tables: (adapt to your data structure)
+                        $('#positive-tbody').html(generateTableRows(data.positiveWords));
+                        $('#negative-tbody').html(generateTableRows(data.negativeWords));
+                        $('#sentimen-tbody').html(generateSentimenRows(data.sentiments));
+
+                        function generateTableRows(data) {
+                            return data.map(item => `<tr><td>${item.word}</td><td>${item.count}</td></tr>`).join('');
+                        }
+
+                        function generateSentimenRows(data) {
+                            return data.map(item => `<tr><td>${item.review}</td><td>${item.sentiment}</td></tr>`).join('');
+                        }
+
+                    },
+                    error: function(error) {
+                        console.error("Error:", error);
+                        alert('Error processing file. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
