@@ -11,11 +11,11 @@ import numpy as np
 import pandas as pd
 import uuid
 
+import logging
 from collections import Counter
 import matplotlib.pyplot as plt
 import base64
 import io
-import logging
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 
@@ -29,15 +29,14 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 app = Flask(__name__)
 
-# Configure logging
-logging.basicConfig(filename='app.log', level=logging.INFO, 
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
-
 # Load TensorFlow model
 model = tf.keras.models.load_model('model')
 model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
               loss=tf.keras.losses.BinaryCrossentropy())
+
+# Configure logging
+logging.basicConfig(filename='app.log', level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')              
 
 # Temp File Dirr              
 UPLOAD_FOLDER = './uploads'
@@ -112,43 +111,45 @@ def klasifikasi_multiple():
 @app.route('/multiple-predict', methods=['POST'])
 def multiple_predict():
     try:
+        # Check the request file
         if 'file' not in request.files:
             return jsonify({"error": "No file part"}), 400
         file = request.files['file']
         if file.filename == '':
             return jsonify({"error": "No selected file"}), 400
-
+        # Store as temp file
         file_uuid = str(uuid.uuid4())  #unique filename
         filename = file_uuid + ".xlsx" #save as excel
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        logging.info(f"File '{filename}' received and saved to '{file_path}'.")
-
+        # Now use the multiple_predict logic 
         try:
             df = pd.read_excel(file_path)
             texts = df['content'].tolist()
 
+            review = []
             predictions = []
-            preprocessed_texts = []
             positive_words = []
             negative_words = []
 
             for x in texts:
                 try:
+                    # Predict
                     preprocessed_text = preprocess_text(x)
                     prediction = model.predict([preprocessed_text])
-                    sentiment = format_prediction(prediction) #fixed this part
+                    sentiment = format_prediction(prediction)
+                    # Store the review and the predict result
+                    review.append(x)
                     predictions.append(sentiment)
-                    preprocessed_texts.append(preprocessed_text)
-
-                    if sentiment == "Positive": #fixed this part
+                    # Count the words    
+                    if sentiment == "Positive":
                         positive_words.extend(get_top_n_words(x))
-                    elif sentiment == "Negative": #fixed this part
+                    elif sentiment == "Negative":
                         negative_words.extend(get_top_n_words(x))
 
                 except Exception as e:
-                    logging.error(f"Error during prediction for text '{x}': {e}")  # Log the error
+                    print(f"Error during prediction for text '{x}': {e}")
                     predictions.append("Error")
                     preprocessed_texts.append("Error")
 
@@ -157,30 +158,95 @@ def multiple_predict():
 
             result = {
                 "predictions": predictions,
-                "preprocessed_texts": preprocessed_texts,
+                "review": review,
                 "top_positive_words": positive_word_counts.most_common(10),
                 "top_negative_words": negative_word_counts.most_common(10)
             }
 
-            logging.info(f"Prediction results: {result}")
-
             return jsonify(result)
 
         except Exception as e:
-            logging.error(f"Error reading Excel file or during prediction: {e}")
             return jsonify({"error": f"Error reading Excel file or during prediction: {e}"}), 500
 
-        finally:
+        finally: #remove temp file
             os.remove(file_path)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+#Scraping Predict
+@app.route('/klasifikasi-scraping')
+def klasifikasi_scraping():
+    return render_template('klasifikasi-scraping.html')
+
+#Scraping Predict Return
+@app.route('/scraping-predict', methods=['POST'])
+def scraping_predict():
+    try:
+        num_reviews = int(request.form.get('num_reviews', 100))
+        logging.info(f"Scraping {num_reviews} reviews")
+
+        try:
+            from google_play_scraper import reviews, Sort
+
+            results, _ = reviews(
+                'com.discord',  # Replace with the desired app ID
+                lang='en',
+                country='id',
+                sort=Sort.NEWEST,
+                count=num_reviews,
+            )
+            logging.info(f"Scraping completed successfully. Received {len(results)} reviews.")
+            
+            reviews_data = [r['content'] for r in results]
+            
+            logging.info(f"Extracted reviews: {reviews_data}")
+
+            predictions = []
+            positive_words = []
+            negative_words = []
+
+            for x in reviews_data:
+                try:
+                    preprocessed_text = preprocess_text(x)
+                    prediction = model.predict([preprocessed_text])
+                    sentiment = format_prediction(prediction)
+
+                    predictions.append(sentiment)
+
+                    if sentiment == "Positive":
+                        positive_words.extend(get_top_n_words(x))
+                    elif sentiment == "Negative":
+                        negative_words.extend(get_top_n_words(x))
+
+                except Exception as e:
+                    logging.error(f"Error during prediction for review '{x}': {e}")
+                    predictions.append("Error")
+
+            positive_word_counts = Counter(word for word, count in positive_words)
+            negative_word_counts = Counter(word for word, count in negative_words)
+
+            result = {
+                "predictions": predictions,
+                "reviews": reviews_data,
+                "top_positive_words": positive_word_counts.most_common(10),
+                "top_negative_words": negative_word_counts.most_common(10)
+            }
+            return jsonify(result)
+
+        except Exception as e:
+            logging.error(f"Error processing or predicting reviews: {e}")
+            return jsonify({"error": f"Error processing or predicting reviews: {e}"}), 500
+
+
+        except Exception as e:
+            logging.error(f"Error during scraping: {e}")
+            return jsonify({"error": f"Error during scraping: {e}"}), 500
+
 
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
         return jsonify({"error": str(e)}), 500
-
-
-@app.route('/model-evaluation')
-def model_evaluation():
-    return render_template('model-evaluation.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

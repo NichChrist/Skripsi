@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klasifikasi File Xlsx</title>
+    <title>Klasifikasi Scraping</title>
     <link rel="stylesheet" href="static/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <body>
 
@@ -19,14 +19,15 @@
     <div class="container">
         <div class="section">
             <div class="upload-section">
-                <h2>Klasifikasi File Xlsx</h2>
+                <h2>Klasifikasi Scraping</h2>
                 <div class="upload-area">
-                    <form id="upload-form" method="POST" enctype="multipart/form-data">
-                        <input type="file" name="file" accept=".xlsx" required>
-                        <button type="submit">Upload & Analisis</button>
+                    <form id="upload-form" method="POST">
+                        <label for="num_reviews">Jumlah Review:</label>
+                        <input type="number" id="num_reviews" name="num_reviews" min="1" value="100" required>  </input>
+                        <button type="submit">Scrape & Evaluate</button>
                     </form>
                 </div>
-                <h3 id="prediction">Status</h3>
+                <h3 id="Status">Status</h3>
             </div>
 
             <div class="top-section">
@@ -66,7 +67,6 @@
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -82,7 +82,7 @@
                 $('#prediction').text('Processing...');
 
                 $.ajax({
-                    url: '/multiple-predict',
+                    url: '/scraping-predict',
                     type: 'POST',
                     data: formData,
                     contentType: false,
@@ -108,7 +108,7 @@
 
                         let sentimenRowsData = [];
                         for (let i = 0; i < data.predictions.length; i++) {
-                            sentimenRowsData.push({content: data.review[i], sentiment: data.predictions[i]});
+                            sentimenRowsData.push({content: data.reviews[i], sentiment: data.predictions[i]});
                         }
 
                         $('#sentimen-tbody').html(generateSentimenRows(sentimenRowsData));
