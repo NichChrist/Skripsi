@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Sentimen Ulasan Discord</title>
+    <title>Discord Review Analysis Sentiment</title>
     <link rel="stylesheet" href="static/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <body>
 
     <div class="navbar">
-        <div class="nav-item"><a href="/">Analisis Sentimen Ulasan Discord</a></div>
-        <div class="nav-item"><a href="/single">Klasifikasi</a></div>
-        <div class="nav-item"><a href="/klasifikasi-multiple">Klasifikasi Multiple</a></div>
-        <div class="nav-item"><a href="/klasifikasi-scraping">Klasifikasi Scraping</a></div>
+        <div class="nav-item"><a href="/">Discord Review Analysis Sentiment</a></div>
+        <div class="nav-item"><a href="/single">Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-multiple">Multiple Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
     </div>
 
     <div class="container">
         <div class="section">
             <div class="upload-section">
-                <h2>Klasifikasi Scraping</h2>
+                <h2>Scraping Classification</h2>
                 <div class="upload-area">
                     <form id="upload-form" method="POST">
-                        <label for="num_reviews">Jumlah Review:</label>
+                        <label for="num_reviews">Total Review:</label>
                         <input type="number" id="num_reviews" name="num_reviews" min="1" value="100" required>  </input>
                         <button type="submit">Scrape & Evaluate</button>
                     </form>
@@ -32,19 +32,19 @@
 
             <div class="top-section">
                 <div class="box" style="grid-column: 1 / span 2;">
-                    <h4>10 Kata Positif Terbanyak</h4>
+                    <h4>10 Most Frequent Positive Word(s)</h4>
                     <table id="positive-table">
                         <thead>
-                            <tr><th>Kata</th><th>Jumlah</th></tr>
+                            <tr><th>Word</th><th>Count</th></tr>
                         </thead>
                         <tbody id="positive-tbody"></tbody>
                     </table>
                 </div>
                 <div class="box" style="grid-column: 1 / span 2;">
-                    <h4>10 Kata Negatif Terbanyak</h4>
+                    <h4>10 Most Frequent Negative Word(s)</h4>
                     <table id="negative-table">
                         <thead>
-                            <tr><th>Kata</th><th>Jumlah</th></tr>
+                            <tr><th>Word</th><th>Count</th></tr>
                         </thead>
                         <tbody id="negative-tbody"></tbody>
                     </table>
@@ -55,7 +55,7 @@
 
         <div class="bottom-section">
             <div class="box" style="grid-column: 2 / span 2;">
-                <h2>Tabel Hasil Klasifikasi</h2>
+                <h2>Classification Results Table</h2>
                 <table id="sentimen-table">
                     <thead>
                         <tr>

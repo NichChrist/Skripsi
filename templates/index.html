@@ -3,29 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Sentimen Ulasan Discord</title>
+    <title>Discord Review Analysis Sentiment</title>
     <link rel="stylesheet" href="static/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <body>
 
     <div class="navbar">
-        <div class="nav-item"><a href="/">Analisis Sentimen Ulasan Discord</a></div>
-        <div class="nav-item"><a href="/single">Klasifikasi</a></div>
-        <div class="nav-item"><a href="/klasifikasi-multiple">Klasifikasi Multiple</a></div>
-        <div class="nav-item"><a href="/klasifikasi-scraping">Klasifikasi Scraping</a></div>
+        <div class="nav-item"><a href="/">Discord Review Analysis Sentiment</a></div>
+        <div class="nav-item"><a href="/single">Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-multiple">Multiple Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
     </div>
 
-    <div class="container_single">
-        <h2>Klasifikasi Teks</h2>
-        <form id="prediction-form">
-            <label for="input-data">Input Teks:</label>
-            <textarea id="input-data" name="input-data" rows="2"></textarea>
-            <button type="submit">Klasifikasi</button>
-        </form>
-
-        <div id="preprocessing">Preprocessing:</div>
-        <div id="prediction">Klasifikasi:</div>
+    <div class="container">
+        <div class="section">
+            <div class="upload-section">
+                <h2>Model Evaluation</h2>
+                <div class="upload-area">
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="file" accept=".xlsx" required>
+                        <button type="submit">Upload & Evaluate</button>
+                    </form>
+                </div>
+                <h3 id="prediction">Status</h3>
+            </div>
+        </div>    
     </div>
     
     <script>
