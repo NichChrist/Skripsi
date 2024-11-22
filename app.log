@@ -653,3 +653,6 @@
 2024-11-22 12:30:58,342 - INFO - 127.0.0.1 - - [22/Nov/2024 12:30:58] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
 2024-11-22 12:30:59,045 - INFO - 127.0.0.1 - - [22/Nov/2024 12:30:59] "GET / HTTP/1.1" 200 -
 2024-11-22 12:30:59,121 - INFO - 127.0.0.1 - - [22/Nov/2024 12:30:59] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2024-11-22 12:31:30,723 - INFO -  * Detected change in 'D:\\College\\Skirpsi\\Semester 9\\Website\\app.py', reloading
+2024-11-22 12:31:31,808 - INFO -  * Restarting with stat
+2024-11-22 12:33:15,012 - INFO -  * Restarting with stat
