@@ -149,7 +149,7 @@ def evaluate():
 
                     prediction = model.predict([preprocessed_text[-1]])
                     sentiment = format_prediction(prediction)
-                    
+
                     predictions.append(sentiment)
                     preprocessed_texts.append(preprocessed_text)
 
@@ -161,7 +161,7 @@ def evaluate():
             result = {
             "predictions": predictions,
             "preprocessed_texts": preprocessed_texts,
-            "review": texts
+            "reviews": texts
             }
 
             logging.info(f"Evaluation results: {result}")
@@ -263,7 +263,7 @@ def multiple_predict():
 
             result = {
                 "predictions": predictions,
-                "review": review,
+                "reviews": review,
                 "top_positive_words": positive_word_counts.most_common(10),
                 "top_negative_words": negative_word_counts.most_common(10)
             }

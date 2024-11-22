@@ -76,7 +76,7 @@
                             return;
                         }
 
-                        if (!data.predictions || !data.preprocessed_texts || !data.review) {
+                        if (!data.predictions || !data.preprocessed_texts || !data.reviews) {
                             console.error('Invalid data format from server:', data);
                             alert('Error: Invalid data received from server.');
                             return;
@@ -88,7 +88,7 @@
                                 return `<tr><td colspan="5">Error: Invalid data format for this review</td></tr>`;
                             }
                             return `<tr>
-                                <td>${data.review[index]}</td>
+                                <td>${data.reviews[index]}</td>
                                 <td>${item[0]}</td>
                                 <td>${item[1]}</td>
                                 <td>${item[2]}</td>
