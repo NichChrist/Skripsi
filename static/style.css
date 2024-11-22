@@ -88,7 +88,7 @@ body {
     margin: 30px auto;
     background-color: #2f3136;
     border-radius: 8px;
-    border: 1px solid #4f545c;
+    border: 1px solid #444444;
 }
 
 .table-wrapper {
@@ -104,7 +104,7 @@ body {
 }
 
 #sentimen-table th, #sentimen-table td {
-    border: 1px solid #4f545c;
+    border: 1px solid #444444;
     padding: 8px; 
     text-align: left;
 }
