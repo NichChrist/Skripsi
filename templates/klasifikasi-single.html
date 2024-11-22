@@ -16,19 +16,16 @@
         <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
     </div>
 
-    <div class="container">
-        <div class="section">
-            <div class="upload-section">
-                <h2>Model Evaluation</h2>
-                <div class="upload-area">
-                    <form id="upload-form" method="POST" enctype="multipart/form-data">
-                        <input type="file" name="file" accept=".xlsx" required>
-                        <button type="submit">Upload & Evaluate</button>
-                    </form>
-                </div>
-                <h3 id="prediction">Status</h3>
-            </div>
-        </div>    
+    <div class="container_single">
+        <h2>Singular Text Classification</h2>
+        <form id="prediction-form">
+            <label for="input-data">Input:</label>
+            <textarea id="input-data" name="input-data" rows="2"></textarea>
+            <button type="submit">Classificate</button>
+        </form>
+
+        <div id="preprocessing">Preprocessing:</div>
+        <div id="prediction">Classification:</div>
     </div>
     
     <script>
