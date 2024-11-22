@@ -91,6 +91,30 @@ body {
     border: 1px solid #4f545c;
 }
 
+.table-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #4f545c;
+    margin-top: 10px; 
+}
+
+#sentimen-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#sentimen-table th, #sentimen-table td {
+    border: 1px solid #4f545c;
+    padding: 8px; 
+    text-align: left;
+}
+
+#sentimen-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;            
+}
+
 .box {
     background-color: #202225;
     border-radius: 8px;
