@@ -43,7 +43,7 @@ UPLOAD_FOLDER = './uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Universal Def for pre-processing and post-processing       
+# Universal Def for pre-processing
 def preprocess_text(text):
     text = text.lower()
     text = ''.join(char for char in text if ord(char) < 128)
@@ -63,7 +63,7 @@ def preprocess_text(text):
     lemmas = [wnl.lemmatize(token, pos=get_wordnet_pos(token)) for token in tokens]
     return ' '.join(lemmas)
 
-# prediction format
+# universal Def for Prediction Format
 def format_prediction(prediction):
     if prediction >= 0.5:
         return "Positive"
@@ -83,7 +83,7 @@ def get_top_n_words(text, n=10):
 def index():
     return render_template('index.html')
 
-#Singular Predict
+#Singular Predict Page
 @app.route('/single')
 def singular():
     return render_template('klasifikasi-single.html')
@@ -106,7 +106,7 @@ def predict():
         return jsonify({'error': str(e)}), 500
 
 
-#Multiple Predict
+#Multiple Predict Page
 @app.route('/klasifikasi-multiple')
 def klasifikasi_multiple():
     return render_template('klasifikasi-multiple.html')
@@ -178,7 +178,7 @@ def multiple_predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-#Scraping Predict
+#Scraping Predict Page
 @app.route('/klasifikasi-scraping')
 def klasifikasi_scraping():
     return render_template('klasifikasi-scraping.html')
