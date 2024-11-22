@@ -78,11 +78,15 @@ def get_top_n_words(text, n=10):
     word_counts = Counter(words)
     return word_counts.most_common(n)        
 
-
-#Singular Predict
+#Main Page
 @app.route('/')
 def index():
     return render_template('index.html')
+
+#Singular Predict
+@app.route('/single')
+def singular():
+    return render_template('klasifikasi-single.html')
 
 #Singular Predict Return
 @app.route('/predict', methods=['POST'])
