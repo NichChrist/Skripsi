@@ -115,71 +115,72 @@ def index():
     return render_template('index.html')
 
 #Main Page Return
-@app.route('/evaluate')
-def evalutate():
+@app.route('/evaluate', methods=['POST'])
+def evaluate():
+    if 'file' not in request.files:
+        logging.error("No file part")
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        logging.error("No selected file")
+        return jsonify({"error": "No selected file"}), 400
+
     try:
-        # Check the request file
-        if 'file' not in request.files:
-            return jsonify({"error": "No file part"}), 400
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
-        # Store as temp file
-        file_uuid = str(uuid.uuid4())  #unique filename
-        filename = file_uuid + ".xlsx" #save as excel
+        file_uuid = str(uuid.uuid4())
+        filename = file_uuid + ".xlsx"
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
+        logging.info(f"File '{filename}' saved to '{file_path}'.")
 
-        # Now use the multiple_predict logic 
         try:
             df = pd.read_excel(file_path)
             texts = df['content'].tolist()
-
             review = []
+            preprocessed_texts = []
             predictions = []
-            positive_words = []
-            negative_words = []
 
-            for x in texts:
+            for index, x in enumerate(texts):
                 try:
-                    # Predict
-                    preprocessed_text = preprocess_text(x)
-                    prediction = model.predict([preprocessed_text])
+                    preprocessed_text = evaluation_preprocess_text(x)
+                    if preprocessed_text[0] == "Error":
+                        predictions.append("Error")
+                        preprocessed_texts.append("Error")
+                        continue
+
+                    prediction = model.predict([preprocessed_text[-1]])
                     sentiment = format_prediction(prediction)
-                    # Store the review and the predict result
-                    review.append(x)
+                    
                     predictions.append(sentiment)
-                    # Count the words    
-                    if sentiment == "Positive":
-                        positive_words.extend(get_top_n_words(x))
-                    elif sentiment == "Negative":
-                        negative_words.extend(get_top_n_words(x))
+                    preprocessed_texts.append(preprocessed_text)
 
                 except Exception as e:
-                    print(f"Error during prediction for text '{x}': {e}")
+                    logging.error(f"Error during prediction for review {index + 1}: {e}")
                     predictions.append("Error")
                     preprocessed_texts.append("Error")
 
-            positive_word_counts = Counter(word for word, count in positive_words)
-            negative_word_counts = Counter(word for word, count in negative_words)
-
             result = {
-                "predictions": predictions,
-                "review": review,
-                "top_positive_words": positive_word_counts.most_common(10),
-                "top_negative_words": negative_word_counts.most_common(10)
+            "predictions": predictions,
+            "preprocessed_texts": preprocessed_texts,
+            "review": texts
             }
+
+            logging.info(f"Evaluation results: {result}")
 
             return jsonify(result)
 
         except Exception as e:
+            logging.exception(f"Error reading Excel file or during prediction: {e}")
             return jsonify({"error": f"Error reading Excel file or during prediction: {e}"}), 500
 
-        finally: #remove temp file
-            os.remove(file_path)
-
     except Exception as e:
+        logging.exception("An unexpected error occurred: %s", str(e))
         return jsonify({"error": str(e)}), 500
+    finally:
+        try:
+            os.remove(file_path)
+            logging.info(f"Removed temporary file: {file_path}")
+        except Exception as e:
+            logging.error(f"Error deleting temporary file: {e}")
 
 #Singular Predict Page
 @app.route('/single')
