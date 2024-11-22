@@ -48,7 +48,7 @@
                     data: JSON.stringify({ text: inputData }),
                     success: function(data) {
                         $('#preprocessing').text(`Preprocessing: ${data.preprocessing}`);
-                        $('#prediction').text(`Klasifikasi: ${data.prediction}`);
+                        $('#prediction').text(`Classification: ${data.prediction}`);
                     },
                     error: function(error) {
                         console.error('Error:', error);
