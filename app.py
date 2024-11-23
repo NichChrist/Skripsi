@@ -89,10 +89,12 @@ def evaluation_preprocess_text(text):
         tag_dict = {"J": wordnet.ADJ, "N": wordnet.NOUN, "V": wordnet.VERB, "R": wordnet.ADV}
         return tag_dict.get(tag, wordnet.NOUN)
 
+    # Lemmatize the text_no_stopwords
+    tokens = word_tokenize(text_no_stopwords)
     lemmas = [wnl.lemmatize(token, pos=get_wordnet_pos(token)) for token in tokens]
     text_lemmatized = ' '.join(lemmas)
 
-    return [text_lower, text_ascii, text_no_punct, text_no_stopwords, text_lemmatized]    
+    return [text_lower, text_ascii, text_no_punct, text_no_stopwords, text_lemmatized]   
 
 # universal Def for Prediction Format
 def format_prediction(prediction):
@@ -237,6 +239,8 @@ def multiple_predict():
             predictions = []
             positive_words = []
             negative_words = []
+            positive_count = 0
+            negative_count = 0
 
             for x in texts:
                 try:
@@ -249,8 +253,10 @@ def multiple_predict():
                     predictions.append(sentiment)
                     # Count the words    
                     if sentiment == "Positive":
+                        positive_count += 1
                         positive_words.extend(get_top_n_words(x))
                     elif sentiment == "Negative":
+                        negative_count += 1
                         negative_words.extend(get_top_n_words(x))
 
                 except Exception as e:
@@ -265,7 +271,9 @@ def multiple_predict():
                 "predictions": predictions,
                 "reviews": review,
                 "top_positive_words": positive_word_counts.most_common(10),
-                "top_negative_words": negative_word_counts.most_common(10)
+                "top_negative_words": negative_word_counts.most_common(10),
+                "total_positive": positive_count,
+                "total_negative": negative_count
             }
 
             logging.info(f"Prediction successful: {result}")
@@ -312,6 +320,8 @@ def scraping_predict():
             predictions = []
             positive_words = []
             negative_words = []
+            positive_count = 0
+            negative_count = 0
 
             for x in reviews_data:
                 try:
@@ -322,8 +332,10 @@ def scraping_predict():
                     predictions.append(sentiment)
 
                     if sentiment == "Positive":
+                        positive_count += 1
                         positive_words.extend(get_top_n_words(x))
                     elif sentiment == "Negative":
+                        negative_count += 1
                         negative_words.extend(get_top_n_words(x))
 
                 except Exception as e:
@@ -337,7 +349,9 @@ def scraping_predict():
                 "predictions": predictions,
                 "reviews": reviews_data,
                 "top_positive_words": positive_word_counts.most_common(10),
-                "top_negative_words": negative_word_counts.most_common(10)
+                "top_negative_words": negative_word_counts.most_common(10),
+                "total_positive": positive_count,
+                "total_negative": negative_count
             }
 
             logging.info(f"Prediction successful: {result}")

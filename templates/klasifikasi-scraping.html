@@ -27,7 +27,7 @@
                         <button type="submit">Scrape & Classificate</button>
                     </form>
                 </div>
-                <h3 id="Status">Status</h3>
+                <h3 id="prediction">Status</h3>
             </div>
 
             <div class="top-section">
@@ -67,6 +67,10 @@
                         <tbody id="sentimen-tbody"></tbody>
                     </table>
                 </div>
+                <div class="totals">
+                    <p>Total Positive: <span id="total-positive"></span></p>
+                    <p>Total Negative: <span id="total-negative"></span></p>
+                </div>
             </div>
         </div>
 
@@ -81,6 +85,8 @@
                 $('#positive-tbody').html('');
                 $('#negative-tbody').html('');
                 $('#sentimen-tbody').html('');
+                $('#total-positive').text('');
+                $('#total-negative').text('');
 
                 $('#prediction').text('Processing...');
 
@@ -108,6 +114,9 @@
 
                         $('#positive-tbody').html(generateTableRows(data.top_positive_words));
                         $('#negative-tbody').html(generateTableRows(data.top_negative_words));
+
+                        $('#total-positive').text(data.total_positive);
+                        $('#total-negative').text(data.total_negative);
 
                         let sentimenRowsData = [];
                         for (let i = 0; i < data.predictions.length; i++) {

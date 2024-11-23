@@ -128,6 +128,12 @@ h2, h4, th  {
     margin-bottom: 20px;
 }
 
+p {
+    color: #7289da;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -147,6 +153,7 @@ form {
 }
 
 label {
+    color: #7289da;
     font-weight: bold;
 }
 
@@ -180,6 +187,6 @@ button:hover {
 #preprocessing,
 #prediction {
     margin-top: 20px;
+    color: #7289da;
     font-weight: bold;
-    color: #dcddde;
 }
