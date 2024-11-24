@@ -51,6 +51,14 @@
             </div>
         </div>
 
+        <div class="bottom-section">
+            <h2>Confusion Matrix & Accuracy</h2>
+                <div id="confusion-matrix">
+                    <img src="" alt="Confusion Matrix">
+                </div>
+            <p id="accuracy"></p>
+        </div>
+
     </div>
     
     <script>
@@ -70,11 +78,6 @@
                     contentType: false,
                     processData: false,
                     success: function(data) {
-                        if (data.error) {
-                            console.error('Error from server:', data.error);
-                            alert('Error: ' + data.error);
-                            return;
-                        }
 
                         if (!data.predictions || !data.preprocessed_texts || !data.reviews) {
                             console.error('Invalid data format from server:', data);
@@ -96,13 +99,16 @@
                                 <td>${item[4]}</td>
                             </tr>`;
                         }).join('');
+
                         $('#prediction').text('Done')
                         $('#sentimen-tbody').html(rows);
                     },
                     error: function(error) {
-                        $('#prediction').text('Error');
-                        console.error('Error:', error);
-                        alert('Error during file processing. Please try again.');
+                        if (error.responseJSON && error.responseJSON.error) {
+                            $('#prediction').text('Error: ' + error.responseJSON.error);
+                        } else {
+                            $('#prediction').text('An error occurred. Please try again.');
+                        }
                     }
                 });
             });
