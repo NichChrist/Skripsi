@@ -184,8 +184,7 @@ def evaluate():
                 try:
                     preprocessed_text = evaluation_preprocess_text(x)
                     if preprocessed_text[0] == "Error":
-                        predictions.append("Error")
-                        preprocessed_texts.append("Error")
+                        df = df.drop(index) 
                         continue
 
                     prediction = model.predict([preprocessed_text[-1]])
