@@ -179,6 +179,7 @@ def evaluate():
             review = []
             preprocessed_texts = []
             predictions = []
+            labels = []
 
             for index, x in enumerate(texts):
                 try:
@@ -190,6 +191,10 @@ def evaluate():
                     prediction = model.predict([preprocessed_text[-1]])
                     sentiment = format_prediction(prediction)
 
+                    label_value = df.loc[index, 'label']
+                    label_string = format_prediction(label_value)
+                    labels.append(label_string)
+
                     df.loc[index, 'sentiment'] = 1 if prediction >= 0.5 else 0
                     predictions.append(sentiment)
                     preprocessed_texts.append(preprocessed_text)
@@ -198,6 +203,7 @@ def evaluate():
                     logging.error(f"Error during prediction for review {index + 1}: {e}")
                     predictions.append("Error")
                     preprocessed_texts.append("Error")
+                    labels.append("Error")
 
 
             cm = confusion_matrix(df['label'],df['sentiment'])
@@ -217,7 +223,8 @@ def evaluate():
             "predictions": predictions,
             "preprocessed_texts": preprocessed_texts,
             "reviews": texts,
-            "accuracy": accuracy
+            "accuracy": accuracy,
+            "labels" : labels
             }
 
             logging.info(f"Evaluation results: {result}")

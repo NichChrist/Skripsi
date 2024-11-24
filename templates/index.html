@@ -30,6 +30,7 @@
             </div>
         </div>   
         
+        
         <div class="bottom-section">
             <div class="box" style="grid-column: 2 / span 2;">
                 <h2>Classification Results Table</h2>
@@ -43,6 +44,24 @@
                                 <th>Remove Punctuation</th>
                                 <th>Stop Word</th>
                                 <th>Lemmatization</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preprocess-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="box" style="grid-column: 2 / span 2;">
+                <h2>Classification Results Table</h2>
+                <div class="table-wrapper">
+                    <table id="text-table">
+                        <thead>
+                            <tr>
+                                <th>Review</th>
+                                <th>Label</th>
+                                <th>Prediction</th>
                             </tr>
                         </thead>
                         <tbody id="sentimen-tbody"></tbody>
@@ -67,9 +86,11 @@
                 event.preventDefault();
                 var formData = new FormData(this);
 
+
+                $('#preprocess-tbody').html('');
                 $('#sentimen-tbody').html('');
-                $('#confusion-matrix img').attr('src', 'static/confusion_matrix_default.png');
                 $('#accuracy').text('');
+                $('#confusion-matrix img').attr('src', 'static/confusion_matrix_default.png');
 
                 $('#prediction').text('Processing...');
 
@@ -87,7 +108,7 @@
                             return;
                         }
 
-                        let rows = data.preprocessed_texts.map((item, index) => {
+                        let preprocess_rows = data.preprocessed_texts.map((item, index) => {
                             if (!Array.isArray(item) || item.length !== 5) {
                                 console.error("Invalid preprocessed_texts format for review", index, item);
                                 return `<tr><td colspan="5">Error: Invalid data format for this review</td></tr>`;
@@ -102,9 +123,18 @@
                             </tr>`;
                         }).join('');
 
+                        let prediction_rows = data.preprocessed_texts.map((item, index) => {
+                            return `<tr>
+                                <td>${data.reviews[index]}</td>
+                                <td>${data.labels[index]}</td>
+                                <td>${data.predictions[index]}</td>
+                            </tr>`;
+                        }).join('');
+
                         $('#prediction').text('Done')
 
-                        $('#sentimen-tbody').html(rows);
+                        $('#preprocess-tbody').html(preprocess_rows);
+                        $('#sentimen-tbody').html(prediction_rows);
                         $('#confusion-matrix img').attr('src', 'static/confusion_matrix_result.png');
                         $('#accuracy').text(data.accuracy + '%');
                     },
