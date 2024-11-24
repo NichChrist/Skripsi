@@ -53,10 +53,10 @@
 
         <div class="bottom-section">
             <h2>Confusion Matrix & Accuracy</h2>
-                <div id="confusion-matrix">
-                    <img src="" alt="Confusion Matrix">
-                </div>
-            <p id="accuracy"></p>
+            <div id="confusion-matrix">
+                <img src="static/confusion_matrix_default.png" alt="Confusion Matrix">
+                <p>Accuracy: <span id="accuracy"></span></p>
+            </div>
         </div>
 
     </div>
@@ -68,6 +68,8 @@
                 var formData = new FormData(this);
 
                 $('#sentimen-tbody').html('');
+                $('#confusion-matrix img').attr('src', 'static/confusion_matrix_default.png');
+                $('#accuracy').text('');
 
                 $('#prediction').text('Processing...');
 
@@ -79,7 +81,7 @@
                     processData: false,
                     success: function(data) {
 
-                        if (!data.predictions || !data.preprocessed_texts || !data.reviews) {
+                        if (!data.predictions || !data.preprocessed_texts || !data.reviews || !data.accuracy) {
                             console.error('Invalid data format from server:', data);
                             alert('Error: Invalid data received from server.');
                             return;
@@ -101,7 +103,10 @@
                         }).join('');
 
                         $('#prediction').text('Done')
+
                         $('#sentimen-tbody').html(rows);
+                        $('#confusion-matrix img').attr('src', 'static/confusion_matrix_result.png');
+                        $('#accuracy').text(data.accuracy + '%');
                     },
                     error: function(error) {
                         if (error.responseJSON && error.responseJSON.error) {

@@ -11,12 +11,14 @@ import numpy as np
 import pandas as pd
 import uuid
 
-import logging
 from collections import Counter
-import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import threading
+import logging
 import base64
 import io
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 
 # Download NLTK resources first
@@ -42,6 +44,11 @@ logging.basicConfig(filename='app.log', level=logging.INFO,
 UPLOAD_FOLDER = './uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Static File Dirr              
+STATIC_FOLDER = './static'
+app.config['STATIC_FOLDER'] = STATIC_FOLDER
+os.makedirs(STATIC_FOLDER, exist_ok=True)
 
 # Universal Def for pre-processing
 def preprocess_text(text):
@@ -109,7 +116,30 @@ def get_top_n_words(text, n=10):
     tokens = word_tokenize(text.lower())
     words = [word for word in tokens if word.isalnum() and word not in stop_words]
     word_counts = Counter(words)
-    return word_counts.most_common(n)        
+    return word_counts.most_common(n)    
+
+# Accuracy Calculation
+def calculate_accuracy(cm):
+    TP = cm[1, 1]
+    TN = cm[0, 0]
+    FP = cm[0, 1]
+    FN = cm[1, 0]
+    accuracy = ((TP + TN) / (TP + TN + FP + FN)) * 100
+    return accuracy    
+
+# Save Matrix Image
+def matrix_image(cm, image_path):
+    plt.switch_backend('agg')
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    disp.plot(ax=ax)
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    with open(image_path, "wb") as f:
+        f.write(output.getvalue())
+    plt.close(fig)
+    plt.switch_backend('TkAgg')
 
 #Main Page
 @app.route('/')
@@ -161,6 +191,7 @@ def evaluate():
                     prediction = model.predict([preprocessed_text[-1]])
                     sentiment = format_prediction(prediction)
 
+                    df.loc[index, 'sentiment'] = 1 if prediction >= 0.5 else 0
                     predictions.append(sentiment)
                     preprocessed_texts.append(preprocessed_text)
 
@@ -169,10 +200,25 @@ def evaluate():
                     predictions.append("Error")
                     preprocessed_texts.append("Error")
 
+
+            cm = confusion_matrix(df['label'],df['sentiment'])
+
+            accuracy = calculate_accuracy(cm)
+            image_path = os.path.join(app.config['STATIC_FOLDER'], 'confusion_matrix_result.png')
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+            thread = threading.Thread(target=matrix_image, args=(cm, image_path))
+            thread.daemon = True
+            thread.start()
+            thread.join()
+            plt.switch_backend('TkAgg')
+
             result = {
             "predictions": predictions,
             "preprocessed_texts": preprocessed_texts,
-            "reviews": texts
+            "reviews": texts,
+            "accuracy": accuracy
             }
 
             logging.info(f"Evaluation results: {result}")
@@ -240,9 +286,12 @@ def multiple_predict():
         # Now use the multiple_predict logic 
         try:
             df = pd.read_excel(file_path)
-            texts = df['content'].tolist()
 
-            logging.info(f"Extracted reviews: {texts}")
+            if 'content' not in df.columns:
+                logging.error("Excel file must have a 'content' column")
+                return jsonify({"error": "Excel file must have a 'content' column"}), 400
+
+            texts = df['content'].tolist()
 
             review = []
             predictions = []
@@ -349,6 +398,7 @@ def scraping_predict():
 
                 except Exception as e:
                     logging.error(f"Error during prediction for review '{x}': {e}")
+                    return jsonify({"error": f"Error processing or predicting reviews: {e}"}), 500
                     predictions.append("Error")
 
             positive_word_counts = Counter(word for word, count in positive_words)

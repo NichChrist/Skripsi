@@ -1,5 +1,6 @@
 app.log
 /uploads/
+/static/confusion_matrix_result.png
 /node_modules/
 package-lock.json
 package.json
