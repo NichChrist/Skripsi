@@ -51,11 +51,8 @@
                         $('#prediction').text(`Classification: ${data.prediction}`);
                     },
                     error: function(error) {
-                        if (error.responseJSON && error.responseJSON.error) {
-                            $('#prediction').text('Error: ' + error.responseJSON.error);
-                        } else {
-                            $('#prediction').text('An error occurred. Please try again.');
-                        }
+                        console.error('Error:', error);
+                        $('#prediction').text('Error making prediction. Please try again later.');
                     }
                 });
             });

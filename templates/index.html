@@ -70,6 +70,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <div class="bottom-section">
             <h2>Confusion Matrix & Accuracy</h2>
             <div id="confusion-matrix">
@@ -78,6 +79,8 @@
             </div>
         </div>
 
+=======
+>>>>>>> parent of 3dd7b6b (🎸  error message handling)
     </div>
     
     <script>
@@ -101,6 +104,11 @@
                     contentType: false,
                     processData: false,
                     success: function(data) {
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            alert('Error: ' + data.error);
+                            return;
+                        }
 
                         if (!data.predictions || !data.preprocessed_texts || !data.reviews || !data.accuracy) {
                             console.error('Invalid data format from server:', data);
@@ -122,6 +130,7 @@
                                 <td>${item[4]}</td>
                             </tr>`;
                         }).join('');
+<<<<<<< HEAD
 
                         let prediction_rows = data.preprocessed_texts.map((item, index) => {
                             return `<tr>
@@ -131,6 +140,8 @@
                             </tr>`;
                         }).join('');
 
+=======
+>>>>>>> parent of 3dd7b6b (🎸  error message handling)
                         $('#prediction').text('Done')
 
                         $('#preprocess-tbody').html(preprocess_rows);
@@ -139,11 +150,9 @@
                         $('#accuracy').text(data.accuracy + '%');
                     },
                     error: function(error) {
-                        if (error.responseJSON && error.responseJSON.error) {
-                            $('#prediction').text('Error: ' + error.responseJSON.error);
-                        } else {
-                            $('#prediction').text('An error occurred. Please try again.');
-                        }
+                        $('#prediction').text('Error');
+                        console.error('Error:', error);
+                        alert('Error during file processing. Please try again.');
                     }
                 });
             });

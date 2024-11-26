@@ -166,15 +166,6 @@ def evaluate():
 
         try:
             df = pd.read_excel(file_path)
-
-            if 'content' not in df.columns:
-                logging.error("Excel file must have a 'content' column")
-                return jsonify({"error": "Excel file must have a 'content' column"}), 400
-
-            if 'label' not in df.columns:
-                logging.error("Excel file must have a 'label' column")
-                return jsonify({"error": "Excel file must have a 'label' column"}), 400
-
             texts = df['content'].tolist()
             review = []
             preprocessed_texts = []

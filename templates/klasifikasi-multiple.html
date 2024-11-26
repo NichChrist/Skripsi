@@ -126,11 +126,9 @@
                         $('#prediction').text('Done');
                     },
                     error: function(error) {
-                        if (error.responseJSON && error.responseJSON.error) {
-                            $('#prediction').text('Error: ' + error.responseJSON.error);
-                        } else {
-                            $('#prediction').text('An error occurred. Please try again.');
-                        }
+                        $('#prediction').text('Error');
+                        console.error('Error:', error);
+                        alert('Error during file processing. Please try again.');
                     }
                 });
             });
