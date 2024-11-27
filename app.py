@@ -143,7 +143,6 @@ def preprocess():
 
         try:
             df = pd.read_excel(file_path)
-
             if 'content' not in df.columns:
                 logging.error("Excel file must have a 'content' column")
                 return jsonify({"error": "Excel file must have a 'content' column"}), 400
