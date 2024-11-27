@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Review Analysis Sentiment</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-item"><a href="/">Information</a></div>
+        <div class="nav-item"><a href="/preprocessing">Preprocessing</a></div>
+        <div class="nav-item"><a href="/single">Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-multiple">Multiple Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <div class="upload-section">
+                <h2>Model Evaluation</h2>
+                <div class="upload-area">
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="file" accept=".xlsx" required>
+                        <button type="submit">Upload & Evaluate</button>
+                    </form>
+                </div>
+                <h3 id="prediction">Status</h3>
+            </div>
+        </div>   
+        
+        
+        <div class="bottom-section">
+            <div class="box" style="grid-column: 2 / span 2;">
+                <h2>Preprocessing Results</h2>
+                <div class="table-wrapper">
+                    <table id="text-table">
+                        <thead>
+                            <tr>
+                                <th>Review</th>
+                                <th>Case Folding</th>
+                                <th>Remove Non-ASCII</th>
+                                <th>Remove Punctuation</th>
+                                <th>Stop Word</th>
+                                <th>Lemmatization</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preprocess-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    
+    <script>
+        $(document).ready(function() {
+            $('#upload-form').submit(function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+
+                $('#preprocess-tbody').html('');
+
+                $('#prediction').text('Processing...');
+
+                $.ajax({
+                    url: '/preprocess',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(data) {
+
+                        if (!data.preprocessed_texts || !data.reviews) {
+                            console.error('Invalid data format from server:', data);
+                            alert('Error: Invalid data received from server.');
+                            return;
+                        }
+
+                        let preprocess_rows = data.preprocessed_texts.map((item, index) => {
+                            if (!Array.isArray(item) || item.length !== 5) {
+                                console.error("Invalid preprocessed_texts format for review", index, item);
+                                return `<tr><td colspan="5">Error: Invalid data format for this review</td></tr>`;
+                            }
+                            return `<tr>
+                                <td>${data.reviews[index]}</td>
+                                <td>${item[0]}</td>
+                                <td>${item[1]}</td>
+                                <td>${item[2]}</td>
+                                <td>${item[3]}</td>
+                                <td>${item[4]}</td>
+                            </tr>`;
+                        }).join('');
+
+                        $('#prediction').text('Done')
+
+                        $('#preprocess-tbody').html(preprocess_rows);
+                    },
+                    error: function(error) {
+                        if (error.responseJSON && error.responseJSON.error) {
+                            $('#prediction').text('Error: ' + error.responseJSON.error);
+                        } else {
+                            $('#prediction').text('An error occurred. Please try again.');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -10,7 +10,8 @@
 <body>
 
     <div class="navbar">
-        <div class="nav-item"><a href="/">Discord Review Analysis Sentiment</a></div>
+        <div class="nav-item"><a href="/">Information</a></div>
+        <div class="nav-item"><a href="/preprocessing">Preprocessing</a></div>
         <div class="nav-item"><a href="/single">Classification</a></div>
         <div class="nav-item"><a href="/klasifikasi-multiple">Multiple Classification</a></div>
         <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
@@ -19,135 +20,101 @@
     <div class="container">
         <div class="section">
             <div class="upload-section">
-                <h2>Model Evaluation</h2>
-                <div class="upload-area">
-                    <form id="upload-form" method="POST" enctype="multipart/form-data">
-                        <input type="file" name="file" accept=".xlsx" required>
-                        <button type="submit">Upload & Evaluate</button>
-                    </form>
-                </div>
-                <h3 id="prediction">Status</h3>
+                <h2>Model Information</h2>
             </div>
         </div>   
-        
-        
-        <div class="bottom-section">
-            <div class="box" style="grid-column: 2 / span 2;">
-                <h2>Classification Results Table</h2>
-                <div class="table-wrapper">
-                    <table id="text-table">
-                        <thead>
-                            <tr>
-                                <th>Review</th>
-                                <th>Case Folding</th>
-                                <th>Remove Non-ASCII</th>
-                                <th>Remove Punctuation</th>
-                                <th>Stop Word</th>
-                                <th>Lemmatization</th>
-                            </tr>
-                        </thead>
-                        <tbody id="preprocess-tbody"></tbody>
-                    </table>
-                </div>
+
+        <div class="top-section">
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>10 Most Frequent Positive Word(s)</h4>
+                <img src="static/Positive_Word_Cloud.png" alt="Word Cloud">
+                <table id="positive-table">
+                    <thead>
+                        <tr><th>Word</th><th>Count</th></tr>
+                    </thead>
+                    <tbody id="positive-tbody"></tbody>
+                </table>
+            </div>
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>10 Most Frequent Negative Word(s)</h4>
+                <img src="static/Negative_Word_Cloud.png" alt="Word Cloud">
+                <table id="negative-table">
+                    <thead>
+                        <tr><th>Word</th><th>Count</th></tr>
+                    </thead>
+                    <tbody id="negative-tbody"></tbody>
+                </table>
             </div>
         </div>
 
-        <div class="bottom-section">
-            <div class="box" style="grid-column: 2 / span 2;">
-                <h2>Classification Results Table</h2>
-                <div class="table-wrapper">
-                    <table id="text-table">
-                        <thead>
-                            <tr>
-                                <th>Review</th>
-                                <th>Label</th>
-                                <th>Prediction</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sentimen-tbody"></tbody>
-                    </table>
-                </div>
+        <div class="top-section">
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>Training Data Confusion Matrix</h4>
+                <img src="static/Training_Matrix.png" alt="Confusion Matrix">
+                <p>Accuracy: 96.28% <span id="positive-accuracy"></span></p>
             </div>
-        </div>
-
-        <div class="bottom-section">
-            <h2>Confusion Matrix & Accuracy</h2>
-            <div id="confusion-matrix">
-                <img src="static/confusion_matrix_default.png" alt="Confusion Matrix">
-                <p>Accuracy: <span id="accuracy"></span></p>
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>Testing Data Confusion Matrix</h4>
+                <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
+                <p>Accuracy: 89.16% <span id="negative-accuracy"></span></p>
             </div>
         </div>
 
     </div>
     
     <script>
-        $(document).ready(function() {
-            $('#upload-form').submit(function(event) {
-                event.preventDefault();
-                var formData = new FormData(this);
-
-
-                $('#preprocess-tbody').html('');
-                $('#sentimen-tbody').html('');
-                $('#accuracy').text('');
-                $('#confusion-matrix img').attr('src', 'static/confusion_matrix_default.png');
-
-                $('#prediction').text('Processing...');
-
-                $.ajax({
-                    url: '/evaluate',
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(data) {
-
-                        if (!data.predictions || !data.preprocessed_texts || !data.reviews || !data.accuracy) {
-                            console.error('Invalid data format from server:', data);
-                            alert('Error: Invalid data received from server.');
-                            return;
-                        }
-
-                        let preprocess_rows = data.preprocessed_texts.map((item, index) => {
-                            if (!Array.isArray(item) || item.length !== 5) {
-                                console.error("Invalid preprocessed_texts format for review", index, item);
-                                return `<tr><td colspan="5">Error: Invalid data format for this review</td></tr>`;
-                            }
-                            return `<tr>
-                                <td>${data.reviews[index]}</td>
-                                <td>${item[0]}</td>
-                                <td>${item[1]}</td>
-                                <td>${item[2]}</td>
-                                <td>${item[3]}</td>
-                                <td>${item[4]}</td>
-                            </tr>`;
-                        }).join('');
-
-                        let prediction_rows = data.preprocessed_texts.map((item, index) => {
-                            return `<tr>
-                                <td>${data.reviews[index]}</td>
-                                <td>${data.labels[index]}</td>
-                                <td>${data.predictions[index]}</td>
-                            </tr>`;
-                        }).join('');
-
-                        $('#prediction').text('Done')
-
-                        $('#preprocess-tbody').html(preprocess_rows);
-                        $('#sentimen-tbody').html(prediction_rows);
-                        $('#confusion-matrix img').attr('src', 'static/confusion_matrix_result.png');
-                        $('#accuracy').text(data.accuracy + '%');
-                    },
-                    error: function(error) {
-                        if (error.responseJSON && error.responseJSON.error) {
-                            $('#prediction').text('Error: ' + error.responseJSON.error);
-                        } else {
-                            $('#prediction').text('An error occurred. Please try again.');
-                        }
-                    }
-                });
+        const positiveData = [
+            { word: "app", count: 436 },
+            { word: "good", count: 365 },
+            { word: "friend", count: 159 },
+            { word: "discord", count: 138 },
+            { word: "great", count: 137 },
+            { word: "nice", count: 127 },
+            { word: "love", count: 111 },
+            { word: "best", count: 102 },
+            { word: "use", count: 100 },
+            { word: "like", count: 79 },
+        ];
+    
+        const negativeData = [
+            { word: "app", count: 923 },
+            { word: "not", count: 512 },
+            { word: "discord", count: 450 },
+            { word: "get", count: 378 },
+            { word: "update", count: 366 },
+            { word: "cant", count: 342 },
+            { word: "work", count: 322 },
+            { word: "use", count: 321 },
+            { word: "try", count: 307 },
+            { word: "fix", count: 298 },
+        ];
+    
+        // Function to populate a table
+        function populateTable(tableBodyId, data) {
+            const tableBody = document.getElementById(tableBodyId);
+            data.forEach(item => {
+                const row = document.createElement("tr");
+    
+                // Word column
+                const wordCell = document.createElement("td");
+                wordCell.textContent = item.word;
+                row.appendChild(wordCell);
+    
+                // Count column
+                const countCell = document.createElement("td");
+                countCell.textContent = item.count;
+                row.appendChild(countCell);
+    
+                // Append row to table
+                tableBody.appendChild(row);
             });
-        });
+        }
+    
+        // Populate the tables when the page loads
+        window.onload = function() {
+            populateTable("positive-tbody", positiveData);
+            populateTable("negative-tbody", negativeData);
+        };
     </script>
 
 </body>

@@ -12,14 +12,8 @@ import pandas as pd
 import uuid
 
 from collections import Counter
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import threading
 import logging
-import base64
 import io
-import matplotlib.pyplot as plt
-
 
 # Download NLTK resources first
 # nltk.download('punkt_tab')
@@ -34,7 +28,7 @@ app = Flask(__name__)
 # Load TensorFlow model
 model = tf.keras.models.load_model('model')
 model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
-              loss=tf.keras.losses.BinaryCrossentropy())
+            loss=tf.keras.losses.BinaryCrossentropy())
 
 # Configure logging
 logging.basicConfig(filename='app.log', level=logging.INFO,
@@ -127,28 +121,20 @@ def calculate_accuracy(cm):
     accuracy = ((TP + TN) / (TP + TN + FP + FN)) * 100
     return accuracy    
 
-# Save Matrix Image
-def matrix_image(cm, image_path):
-    plt.switch_backend('agg')
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    fig, ax = plt.subplots(figsize=(6, 4))
-    disp.plot(ax=ax)
-    canvas = FigureCanvas(fig)
-    output = io.BytesIO()
-    canvas.print_png(output)
-    with open(image_path, "wb") as f:
-        f.write(output.getvalue())
-    plt.close(fig)
-    plt.switch_backend('TkAgg')
 
 #Main Page
 @app.route('/')
 def index():
     return render_template('index.html')
 
-#Main Page Return
-@app.route('/evaluate', methods=['POST'])
-def evaluate():
+#Preprocessing Page
+@app.route('/preprocessing')
+def preprocessing():
+    return render_template('preprocessing.html')
+
+#Preprocessing Page Return
+@app.route('/preprocess', methods=['POST'])
+def preprocess():
     if 'file' not in request.files:
         logging.error("No file part")
         return jsonify({"error": "No file part"}), 400
@@ -171,15 +157,9 @@ def evaluate():
                 logging.error("Excel file must have a 'content' column")
                 return jsonify({"error": "Excel file must have a 'content' column"}), 400
 
-            if 'label' not in df.columns:
-                logging.error("Excel file must have a 'label' column")
-                return jsonify({"error": "Excel file must have a 'label' column"}), 400
-
             texts = df['content'].tolist()
             review = []
             preprocessed_texts = []
-            predictions = []
-            labels = []
 
             for index, x in enumerate(texts):
                 try:
@@ -187,44 +167,17 @@ def evaluate():
                     if preprocessed_text[0] == "Error":
                         df = df.drop(index) 
                         continue
-
-                    prediction = model.predict([preprocessed_text[-1]])
-                    sentiment = format_prediction(prediction)
-
-                    label_value = df.loc[index, 'label']
-                    label_string = format_prediction(label_value)
-                    labels.append(label_string)
-
-                    df.loc[index, 'sentiment'] = 1 if prediction >= 0.5 else 0
-                    predictions.append(sentiment)
+                    
                     preprocessed_texts.append(preprocessed_text)
 
                 except Exception as e:
                     logging.error(f"Error during prediction for review {index + 1}: {e}")
                     predictions.append("Error")
-                    preprocessed_texts.append("Error")
-                    labels.append("Error")
 
-
-            cm = confusion_matrix(df['label'],df['sentiment'])
-
-            accuracy = calculate_accuracy(cm)
-            image_path = os.path.join(app.config['STATIC_FOLDER'], 'confusion_matrix_result.png')
-            if os.path.exists(image_path):
-                os.remove(image_path)
-
-            thread = threading.Thread(target=matrix_image, args=(cm, image_path))
-            thread.daemon = True
-            thread.start()
-            thread.join()
-            plt.switch_backend('TkAgg')
 
             result = {
-            "predictions": predictions,
             "preprocessed_texts": preprocessed_texts,
             "reviews": texts,
-            "accuracy": accuracy,
-            "labels" : labels
             }
 
             logging.info(f"Evaluation results: {result}")
