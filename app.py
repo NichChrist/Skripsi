@@ -112,15 +112,6 @@ def get_top_n_words(text, n=10):
     word_counts = Counter(words)
     return word_counts.most_common(n)    
 
-# Accuracy Calculation
-def calculate_accuracy(cm):
-    TP = cm[1, 1]
-    TN = cm[0, 0]
-    FP = cm[0, 1]
-    FN = cm[1, 0]
-    accuracy = ((TP + TN) / (TP + TN + FP + FN)) * 100
-    return accuracy    
-
 
 #Main Page
 @app.route('/')
