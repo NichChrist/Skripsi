@@ -27,6 +27,7 @@
         <div class="top-section">
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>10 Most Frequent Positive Word(s)</h4>
+                <h4>From Testing Data(s)</h4>
                 <img src="static/Positive_Word_Cloud.png" alt="Word Cloud">
                 <table id="positive-table">
                     <thead>
@@ -37,6 +38,7 @@
             </div>
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>10 Most Frequent Negative Word(s)</h4>
+                <h4>From Testing Data(s)</h4>
                 <img src="static/Negative_Word_Cloud.png" alt="Word Cloud">
                 <table id="negative-table">
                     <thead>
@@ -51,44 +53,42 @@
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>Training Data Confusion Matrix</h4>
                 <img src="static/Training_Matrix.png" alt="Confusion Matrix">
-                <p>Accuracy: 96.28% <span id="positive-accuracy"></span></p>
+                <p>Accuracy: 94.54% <span id="positive-accuracy"></span></p>
             </div>
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>Testing Data Confusion Matrix</h4>
                 <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
-                <p>Accuracy: 89.16% <span id="negative-accuracy"></span></p>
+                <p>Accuracy: 88.97% <span id="negative-accuracy"></span></p>
             </div>
         </div>
 
-=======
->>>>>>> parent of 3dd7b6b (🎸  error message handling)
     </div>
     
     <script>
         const positiveData = [
-            { word: "app", count: 436 },
-            { word: "good", count: 365 },
-            { word: "friend", count: 159 },
-            { word: "discord", count: 138 },
-            { word: "great", count: 137 },
-            { word: "nice", count: 127 },
-            { word: "love", count: 111 },
-            { word: "best", count: 102 },
-            { word: "use", count: 100 },
-            { word: "like", count: 79 },
-        ];
-    
-        const negativeData = [
-            { word: "app", count: 923 },
-            { word: "not", count: 512 },
-            { word: "discord", count: 450 },
-            { word: "get", count: 378 },
-            { word: "update", count: 366 },
-            { word: "cant", count: 342 },
-            { word: "work", count: 322 },
-            { word: "use", count: 321 },
-            { word: "try", count: 307 },
-            { word: "fix", count: 298 },
+            { word: "app", count: 237 },
+            { word: "good", count: 177 },
+            { word: "friend", count: 80 },
+            { word: "great", count: 79 },
+            { word: "love", count: 67 },
+            { word: "discord", count: 66 },
+            { word: "use", count: 64 },
+            { word: "nice", count: 58 },
+            { word: "best", count: 55 },
+            { word: "like", count: 46 },
+            ];
+
+            const negativeData = [
+            { word: "app", count: 445 },
+            { word: "discord", count: 238 },
+            { word: "not", count: 233 },
+            { word: "get", count: 188 },
+            { word: "update", count: 179 },
+            { word: "use", count: 178 },
+            { word: "work", count: 158 },
+            { word: "cant", count: 157 },
+            { word: "fix", count: 152 },
+            { word: "try", count: 144 },
         ];
     
         // Function to populate a table
