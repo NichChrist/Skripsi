@@ -141,9 +141,6 @@ def main_return():
         # Extract the relevant columns and convert to a list of dictionaries
         result = df[required_columns].to_dict(orient='records')
 
-        # Log the result
-        logging.info(f"Returning evaluation results: {result}")
-
         # Return the JSON response
         return jsonify(result)
 
