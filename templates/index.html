@@ -19,16 +19,39 @@
     </div>
 
     <div class="container">
-        <div class="section">
-            <div class="upload-section">
-                <h2>Model Information</h2>
+        <div class="upload-section">
+            <h2>Model Information</h2>
+        </div> 
+
+        <div class="bottom-section" style="margin-bottom: 20px">
+            <div class="box" style="grid-column: 2 / span 2;">
+                <h2>Test Result</h2>
+                <div class="table-wrapper">
+                    <table id="text-table">
+                        <thead>
+                            <tr>
+                                <th>Review</th>
+                                <th>Label</th>
+                                <th>Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="test-tbody"></tbody>
+                    </table>
+                </div>
             </div>
-        </div>   
+        </div>
+        
+        <div class="top-section">
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>Testing Data Confusion Matrix</h4>
+                <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
+                <p>Accuracy: 88.97% <span id="negative-accuracy"></span></p>
+            </div>
+        </div>
 
         <div class="top-section">
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>10 Most Frequent Positive Word(s)</h4>
-                <h4>From Testing Data(s)</h4>
                 <img src="static/Positive_Word_Cloud.png" alt="Word Cloud">
                 <table id="positive-table">
                     <thead>
@@ -39,7 +62,6 @@
             </div>
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>10 Most Frequent Negative Word(s)</h4>
-                <h4>From Testing Data(s)</h4>
                 <img src="static/Negative_Word_Cloud.png" alt="Word Cloud">
                 <table id="negative-table">
                     <thead>
@@ -50,48 +72,76 @@
             </div>
         </div>
 
-        <div class="top-section">
-            <div class="box" style="grid-column: 1 / span 2;">
-                <h4>Training Data Confusion Matrix</h4>
-                <img src="static/Training_Matrix.png" alt="Confusion Matrix">
-                <p>Accuracy: 94.54% <span id="positive-accuracy"></span></p>
-            </div>
-            <div class="box" style="grid-column: 1 / span 2;">
-                <h4>Testing Data Confusion Matrix</h4>
-                <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
-                <p>Accuracy: 88.97% <span id="negative-accuracy"></span></p>
-            </div>
-        </div>
-
     </div>
     
     <script>
-        const positiveData = [
-            { word: "app", count: 237 },
-            { word: "good", count: 177 },
-            { word: "friend", count: 80 },
-            { word: "great", count: 79 },
-            { word: "love", count: 67 },
-            { word: "discord", count: 66 },
-            { word: "use", count: 64 },
-            { word: "nice", count: 58 },
-            { word: "best", count: 55 },
-            { word: "like", count: 46 },
-            ];
+        $(window).on('load', function() {
+            $.ajax({
+                url: '/main_return',
+                type: 'GET',
+                success: function(data) {
+                    // Handle server errors in response
+                    if (data.error) {
+                        console.error('Error from server:', data.error);
+                        alert('Error: ' + data.error);
+                        return;
+                    }
 
-            const negativeData = [
-            { word: "app", count: 445 },
-            { word: "discord", count: 238 },
-            { word: "not", count: 233 },
-            { word: "get", count: 188 },
-            { word: "update", count: 179 },
-            { word: "use", count: 178 },
-            { word: "work", count: 158 },
-            { word: "cant", count: 157 },
-            { word: "fix", count: 152 },
-            { word: "try", count: 144 },
+                    // Validate the data structure
+                    if (!Array.isArray(data)) {
+                        console.error('Invalid data format from server:', data);
+                        alert('Error: Invalid data received from server.');
+                        return;
+                    }
+
+                    // Populate the table body
+                    let tableBody = $('#test-tbody');
+                    tableBody.empty(); // Clear any existing rows
+
+                    data.forEach(item => {
+                        // Create a new row for each item
+                        const row = `<tr>
+                                        <td>${item.content}</td>
+                                        <td>${item.label}</td>
+                                        <td>${item.sentiment}</td>
+                                    </tr>`;
+                        tableBody.append(row);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = `Error loading data: ${status} - ${error}`;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+        
+        const positiveData = [
+        { word: "app", count: 237 },
+        { word: "good", count: 177 },
+        { word: "friend", count: 80 },
+        { word: "great", count: 79 },
+        { word: "love", count: 67 },
+        { word: "discord", count: 66 },
+        { word: "use", count: 64 },
+        { word: "nice", count: 58 },
+        { word: "best", count: 55 },
+        { word: "like", count: 46 },
         ];
-    
+
+        const negativeData = [
+        { word: "app", count: 445 },
+        { word: "discord", count: 238 },
+        { word: "not", count: 233 },
+        { word: "get", count: 188 },
+        { word: "update", count: 179 },
+        { word: "use", count: 178 },
+        { word: "work", count: 158 },
+        { word: "cant", count: 157 },
+        { word: "fix", count: 152 },
+        { word: "try", count: 144 },
+        ];
+
         // Function to populate a table
         function populateTable(tableBodyId, data) {
             const tableBody = document.getElementById(tableBodyId);
@@ -118,6 +168,7 @@
             populateTable("positive-tbody", positiveData);
             populateTable("negative-tbody", negativeData);
         };
+    
     </script>
 
 </body>

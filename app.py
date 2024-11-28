@@ -118,6 +118,43 @@ def get_top_n_words(text, n=10):
 def index():
     return render_template('index.html')
 
+@app.route('/main_return', methods=['GET'])
+def main_return():
+    try:
+        # Define the file path
+        file_path = os.path.join('static', 'test_result.xlsx')
+        
+        # Read the Excel file
+        df = pd.read_excel(file_path)
+
+        # Ensure the required columns are present
+        required_columns = ["content", "label", "sentiment"]
+        if not all(col in df.columns for col in required_columns):
+            logging.error("Missing required columns in the Excel file.")
+            return jsonify({"error": "Missing required columns in the Excel file."}), 400
+
+        # Check for empty DataFrame
+        if df.empty:
+            logging.warning("The Excel file is empty.")
+            return jsonify({"error": "The Excel file is empty."}), 204  # 204 No Content
+
+        # Extract the relevant columns and convert to a list of dictionaries
+        result = df[required_columns].to_dict(orient='records')
+
+        # Log the result
+        logging.info(f"Returning evaluation results: {result}")
+
+        # Return the JSON response
+        return jsonify(result)
+
+    except FileNotFoundError:
+        logging.error("Excel file not found.")
+        return jsonify({"error": "Excel file not found."}), 404
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return jsonify({"error": f"An error occurred: {e}"}), 500
+
+
 #Preprocessing Page
 @app.route('/preprocessing')
 def preprocessing():
