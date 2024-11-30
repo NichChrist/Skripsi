@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Review Analysis Sentiment</title>
+    <link rel="icon" href="static/Logo.png"type="image/x-icon" />
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-item"><a href="/">Information</a></div>
+        <div class="nav-item"><a href="/preprocessing">Preprocessing</a></div>
+        <div class="nav-item"><a href="/single">Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-multiple">Multiple Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
+    </div>
+
+    <div class="container">
+        <div class="upload-section">
+            <h2>Model Information</h2>
+        </div> 
+
+        <div class="bottom-section" style="margin-bottom: 20px">
+            <div class="box" style="grid-column: 2 / span 2;">
+                <h2>Test Result</h2>
+                <div class="table-wrapper">
+                    <table id="text-table">
+                        <thead>
+                            <tr>
+                                <th>Review</th>
+                                <th>Label</th>
+                                <th>Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="test-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="top-section">
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>Training Data Confusion Matrix</h4>
+                <img src="static/Training_Matrix.png" alt="Confusion Matrix">
+                <p>Accuracy: 94.54% <span id="positive-accuracy"></span></p>
+            </div>
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>Testing Data Confusion Matrix</h4>
+                <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
+                <p>Accuracy: 88.97% <span id="negative-accuracy"></span></p>
+            </div>
+        </div>
+
+        <div class="top-section">
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>10 Most Frequent Positive Word(s)</h4>
+                <img src="static/Merged_Positive_Word_Cloud.png" alt="Word Cloud">
+                <table id="positive-table">
+                    <thead>
+                        <tr><th>Word</th><th>Count</th></tr>
+                    </thead>
+                    <tbody id="positive-tbody"></tbody>
+                </table>
+            </div>
+            <div class="box" style="grid-column: 1 / span 2;">
+                <h4>10 Most Frequent Negative Word(s)</h4>
+                <img src="static/Merged_Negative_Word_Cloud.png" alt="Word Cloud">
+                <table id="negative-table">
+                    <thead>
+                        <tr><th>Word</th><th>Count</th></tr>
+                    </thead>
+                    <tbody id="negative-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    
+    <script>
+        $(window).on('load', function() {
+            $.ajax({
+                url: '/main_return_2',
+                type: 'GET',
+                success: function(data) {
+                    // Handle server errors in response
+                    if (data.error) {
+                        console.error('Error from server:', data.error);
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+
+                    // Validate the data structure
+                    if (!Array.isArray(data)) {
+                        console.error('Invalid data format from server:', data);
+                        alert('Error: Invalid data received from server.');
+                        return;
+                    }
+
+                    // Populate the table body
+                    let tableBody = $('#test-tbody');
+                    tableBody.empty(); // Clear any existing rows
+
+                    data.forEach(item => {
+                        // Create a new row for each item
+                        const row = `<tr>
+                                        <td>${item.content}</td>
+                                        <td>${item.label}</td>
+                                        <td>${item.sentiment}</td>
+                                    </tr>`;
+                        tableBody.append(row);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = `Error loading data: ${status} - ${error}`;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+        
+        const positiveData = [
+        { word: "app", count: 1558 },
+        { word: "good", count: 1287 },
+        { word: "friend", count: 608 },
+        { word: "discord", count: 502 },
+        { word: "great", count: 472 },
+        { word: "love", count: 456 },
+        { word: "best", count: 431 },
+        { word: "nice", count: 427 },
+        { word: "use", count: 376 },
+        { word: "like", count: 324 },
+        ];
+
+        const negativeData = [
+        { word: "app", count: 2974 },
+        { word: "not", count: 1638 },
+        { word: "discord", count: 1588 },
+        { word: "get", count: 1218 },
+        { word: "cant", count: 1129 },
+        { word: "use", count: 1121 },
+        { word: "update", count: 1094 },
+        { word: "fix", count: 1023 },
+        { word: "work", count: 1006 },
+        { word: "try", count: 874 },
+        ];
+
+        // Function to populate a table
+        function populateTable(tableBodyId, data) {
+            const tableBody = document.getElementById(tableBodyId);
+            data.forEach(item => {
+                const row = document.createElement("tr");
+    
+                // Word column
+                const wordCell = document.createElement("td");
+                wordCell.textContent = item.word;
+                row.appendChild(wordCell);
+    
+                // Count column
+                const countCell = document.createElement("td");
+                countCell.textContent = item.count;
+                row.appendChild(countCell);
+    
+                // Append row to table
+                tableBody.appendChild(row);
+            });
+        }
+    
+        // Populate the tables when the page loads
+        window.onload = function() {
+            populateTable("positive-tbody", positiveData);
+            populateTable("negative-tbody", negativeData);
+        };
+    
+    </script>
+
+</body>
+</html>

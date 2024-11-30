@@ -118,6 +118,12 @@ def get_top_n_words(text, n=10):
 def index():
     return render_template('index.html')
 
+#Main Page 2
+@app.route('/index_2')
+def index_2():
+    return render_template('index_2.html')
+
+#Main Return 
 @app.route('/main_return', methods=['GET'])
 def main_return():
     try:
@@ -136,7 +142,10 @@ def main_return():
         # Check for empty DataFrame
         if df.empty:
             logging.warning("The Excel file is empty.")
-            return jsonify({"error": "The Excel file is empty."}), 204  # 204 No Content
+            return jsonify({"error": "The Excel file is empty."}), 204
+
+        df['label'] = df['label'].apply(format_prediction)
+        df['sentiment'] = df['sentiment'].apply(format_prediction)
 
         # Extract the relevant columns and convert to a list of dictionaries
         result = df[required_columns].to_dict(orient='records')
@@ -151,6 +160,42 @@ def main_return():
         logging.error(f"An error occurred: {e}")
         return jsonify({"error": f"An error occurred: {e}"}), 500
 
+# Main Return 2
+@app.route('/main_return_2', methods=['GET'])
+def main_return_2():
+    try:
+        # Define the file path
+        file_path = os.path.join('static', 'merged_result.xlsx')
+        
+        # Read the Excel file
+        df = pd.read_excel(file_path)
+
+        # Ensure the required columns are present
+        required_columns = ["content", "label", "sentiment"]
+        if not all(col in df.columns for col in required_columns):
+            logging.error("Missing required columns in the Excel file.")
+            return jsonify({"error": "Missing required columns in the Excel file."}), 400
+
+        # Check for empty DataFrame
+        if df.empty:
+            logging.warning("The Excel file is empty.")
+            return jsonify({"error": "The Excel file is empty."}), 204
+
+        df['label'] = df['label'].apply(format_prediction)
+        df['sentiment'] = df['sentiment'].apply(format_prediction)
+
+        # Extract the relevant columns and convert to a list of dictionaries
+        result = df[required_columns].to_dict(orient='records')
+
+        # Return the JSON response
+        return jsonify(result)
+
+    except FileNotFoundError:
+        logging.error("Excel file not found.")
+        return jsonify({"error": "Excel file not found."}), 404
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return jsonify({"error": f"An error occurred: {e}"}), 500
 
 #Preprocessing Page
 @app.route('/preprocessing')
