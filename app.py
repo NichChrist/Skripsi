@@ -116,7 +116,7 @@ def get_top_n_words(text, n=10):
 #Main Page
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index_2.html')
 
 #Main Page 2
 @app.route('/index_2')
