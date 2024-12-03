@@ -14,42 +14,23 @@
         <div class="nav-item"><a href="/">Information</a></div>
         <div class="nav-item"><a href="/preprocessing">Preprocessing</a></div>
         <div class="nav-item"><a href="/single">Classification</a></div>
-        <div class="nav-item"><a href="/klasifikasi-multiple">Multiple Classification</a></div>
         <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
     </div>
 
     <div class="container">
         <div class="upload-section">
-            <h2>Model Information</h2>
+            <h2>Testing Results</h2>
         </div> 
 
-        <div class="bottom-section" style="margin-bottom: 20px">
-            <div class="box" style="grid-column: 2 / span 2;">
-                <h2>Test Result</h2>
-                <div class="table-wrapper">
-                    <table id="text-table">
-                        <thead>
-                            <tr>
-                                <th>Review</th>
-                                <th>Label</th>
-                                <th>Sentiment</th>
-                            </tr>
-                        </thead>
-                        <tbody id="test-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
         <div class="top-section">
-            <div class="box" style="grid-column: 1 / span 2;">
+            <div class="box-2">
                 <h4>Testing Data Confusion Matrix</h4>
                 <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
                 <p>Accuracy: 88.97% <span id="negative-accuracy"></span></p>
+                <div class="button-container">
+                    <a href="/data" class="center-button">Data</a>
+                </div>
             </div>
-        </div>
-
-        <div class="top-section">
             <div class="box" style="grid-column: 1 / span 2;">
                 <h4>10 Most Frequent Positive Word(s)</h4>
                 <img src="static/Positive_Word_Cloud.png" alt="Word Cloud">

@@ -60,8 +60,8 @@ body {
 
 .bottom-section {
     margin-top: 20px;
-    flex: 1 0 200px; /* Adjust as needed */
-    background-color: #202225; /* Darker gray boxes */
+    flex: 1 0 200px;
+    background-color: #202225;
     border-radius: 8px;
     color: #dcddde;
 }
@@ -92,27 +92,52 @@ body {
 }
 
 .table-wrapper {
+    display: block;
     max-height: 300px;
     overflow-y: auto;
     border: 1px solid #4f545c;
     margin-top: 10px; 
 }
 
-#sentimen-table {
+.table-wrapper-2{
+    display: block;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #4f545c;
+    margin-top: 10px; 
+}
+
+#text-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-#sentimen-table th, #sentimen-table td {
+th,  td {
     border: 1px solid #444444;
     padding: 8px; 
     text-align: left;
 }
 
-#sentimen-table thead th {
+thead th {
     position: sticky;
     top: 0;
-    z-index: 1;            
+    z-index: 1;
+    background-color: #202225;
+    box-shadow: 2px 2px 4px #202225;            
+}
+
+.button-container {
+    text-align: center;
+}
+
+.center-button {
+    padding: 10px 20px;
+    background-color: #5865f2;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .box {
@@ -120,6 +145,14 @@ body {
     border-radius: 8px;
     padding: 8px;
     color: #dcddde;
+}
+
+.box-2 {
+    background-color: #202225;
+    border-radius: 8px;
+    padding: 8px;
+    color: #dcddde;
+    height: 500px;
 }
 
 h2, h4, th  {

@@ -116,12 +116,12 @@ def get_top_n_words(text, n=10):
 #Main Page
 @app.route('/')
 def index():
-    return render_template('index_2.html')
+    return render_template('index.html')
 
 #Main Page 2
-@app.route('/index_2')
-def index_2():
-    return render_template('index_2.html')
+@app.route('/data')
+def data():
+    return render_template('data.html')
 
 #Main Return 
 @app.route('/main_return', methods=['GET'])
@@ -134,7 +134,7 @@ def main_return():
         df = pd.read_excel(file_path)
 
         # Ensure the required columns are present
-        required_columns = ["content", "label", "sentiment"]
+        required_columns = ["content", "label","score", "sentiment"]
         if not all(col in df.columns for col in required_columns):
             logging.error("Missing required columns in the Excel file.")
             return jsonify({"error": "Missing required columns in the Excel file."}), 400

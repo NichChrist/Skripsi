@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Review Analysis Sentiment</title>
+    <link rel="icon" href="static/Logo.png"type="image/x-icon" />
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-item"><a href="/">Information</a></div>
+        <div class="nav-item"><a href="/preprocessing">Preprocessing</a></div>
+        <div class="nav-item"><a href="/single">Classification</a></div>
+        <div class="nav-item"><a href="/klasifikasi-scraping">Scraping Classification</a></div>
+    </div>
+
+    <div class="container">
+        <div class="upload-section">
+        </div> 
+        <div class="bottom-section" style="margin-bottom: 20px">
+            <div class="box" style="grid-column: 2 / span 2;">
+                <h2>Data</h2>
+                <div class="table-wrapper-2">
+                    <table id="text-table">
+                        <thead>
+                            <tr>
+                                <th>Review</th>
+                                <th>Score</th>
+                                <th>Label</th>
+                                <th>Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="test-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(window).on('load', function() {
+            $.ajax({
+                url: '/main_return',
+                type: 'GET',
+                success: function(data) {
+                    // Handle server errors in response
+                    if (data.error) {
+                        console.error('Error from server:', data.error);
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+
+                    // Validate the data structure
+                    if (!Array.isArray(data)) {
+                        console.error('Invalid data format from server:', data);
+                        alert('Error: Invalid data received from server.');
+                        return;
+                    }
+
+                    // Populate the table body
+                    let tableBody = $('#test-tbody');
+                    tableBody.empty(); // Clear any existing rows
+
+                    data.forEach(item => {
+                        // Create a new row for each item
+                        const row = `<tr>
+                                        <td>${item.content}</td>
+                                        <td>${item.score}</td>
+                                        <td>${item.label}</td>
+                                        <td>${item.sentiment}</td>
+                                    </tr>`;
+                        tableBody.append(row);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    const errorMessage = `Error loading data: ${status} - ${error}`;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
