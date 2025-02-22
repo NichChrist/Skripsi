@@ -27,8 +27,7 @@ app = Flask(__name__)
 
 # Load TensorFlow model
 model = tf.keras.models.load_model('model')
-model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
-            loss=tf.keras.losses.BinaryCrossentropy())
+model.compile(loss=tf.keras.losses.BinaryCrossentropy())
 
 # Configure logging
 logging.basicConfig(filename='app.log', level=logging.INFO,
