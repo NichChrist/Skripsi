@@ -23,10 +23,13 @@
         </div> 
 
         <div class="top-section">
-            <div class="box-2">
+            <div class="box">
                 <h4>Testing Data Confusion Matrix</h4>
                 <img src="static/Testing_Matrix.png" alt="Confusion Matrix">
-                <p>Accuracy: 88.97% <span id="negative-accuracy"></span></p>
+                <p>Accuracy : 93,68% <span id="negative-accuracy"></span></p>
+                <p>Precision: 93,48% <span id="negative-accuracy"></span></p>
+                <p>Recall   : 92,69% <span id="negative-accuracy"></span></p>
+                <p>F1-Score : 93,08% <span id="negative-accuracy"></span></p>
                 <div class="button-container">
                     <a href="/data" class="center-button">Data</a>
                 </div>
@@ -98,30 +101,30 @@
         });
         
         const positiveData = [
-            { word: "app", count: 249 },
-            { word: "good", count: 197 },
-            { word: "friend", count: 102 },
-            { word: "discord", count: 85 },
-            { word: "great", count: 78 },
-            { word: "best", count: 70 },
-            { word: "love", count: 69 },
-            { word: "use", count: 66 },
-            { word: "nice", count: 60 },
-            { word: "like", count: 60 },
-        ];
+        { word: "app", count: 223 },
+        { word: "good", count: 170 },
+        { word: "friend", count: 78 },
+        { word: "great", count: 77 },
+        { word: "discord", count: 68 },
+        { word: "love", count: 68 },
+        { word: "use", count: 62 },
+        { word: "nice", count: 56 },
+        { word: "best", count: 53 },
+        { word: "like", count: 40 },
+    ];
 
-        const negativeData = [
-            { word: "app", count: 485 },
-            { word: "not", count: 228 },
-            { word: "discord", count: 228 },
-            { word: "get", count: 191 },
-            { word: "cant", count: 169 },
-            { word: "use", count: 162 },
-            { word: "update", count: 157 },
-            { word: "work", count: 150 },
-            { word: "fix", count: 136 },
-            { word: "even", count: 129 },
-        ];
+    const negativeData = [
+        { word: "app", count: 459 },
+        { word: "not", count: 241 },
+        { word: "discord", count: 236 },
+        { word: "get", count: 196 },
+        { word: "use", count: 180 },
+        { word: "update", count: 175 },
+        { word: "cant", count: 163 },
+        { word: "work", count: 153 },
+        { word: "fix", count: 150 },
+        { word: "try", count: 149 },
+    ];
 
         // Function to populate a table
         function populateTable(tableBodyId, data) {

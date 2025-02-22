@@ -133,7 +133,7 @@ def main_return():
         df = pd.read_excel(file_path)
 
         # Ensure the required columns are present
-        required_columns = ["content", "label","score", "sentiment"]
+        required_columns = ["content", "label", "sentiment"]
         if not all(col in df.columns for col in required_columns):
             logging.error("Missing required columns in the Excel file.")
             return jsonify({"error": "Missing required columns in the Excel file."}), 400
